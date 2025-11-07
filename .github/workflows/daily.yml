@@ -1,0 +1,26 @@
+name: Daily Commit
+
+on:
+  schedule:
+    - cron: '0 3,9,15,21 * * *'  # 每6小時 commit 一次
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Make daily commit
+        run: |
+          echo "$(date)" > date.txt
+          echo "Random: $RANDOM $(date)" >> log.txt
+          git add date.txt
+          git commit -m "Daily update: $(date)" || echo "No changes to commit"
+          git push
